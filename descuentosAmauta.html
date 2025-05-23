@@ -3,14 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Descuento por Tiempo</title>
+  <title>Calculadora de Descuentos</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body {
-      background-image: url('IPA - DE LA IDEA A LA REALIDAD.jpg'); /* Cambia aquí tu imagen de fondo */
+      background-image: url('IPA - DE LA IDEA A LA REALIDAD.jpg'); /* Cambia aquí tu fondo */
       background-size: cover;
       background-position: center;
-      background-repeat: no-repeat;
     }
     .bg-overlay {
       background-color: rgba(255, 255, 255, 0.92);
@@ -18,74 +17,99 @@
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between">
+<body class="flex flex-col min-h-screen">
 
-  <!-- CONTENIDO PRINCIPAL -->
-  <main class="flex-grow flex items-center justify-center px-4">
+  <!-- MAIN -->
+  <main class="flex-grow flex items-center justify-center p-4">
     <div class="bg-overlay p-8 rounded-2xl shadow-xl w-full max-w-md">
-      
+
       <!-- LOGO -->
       <div class="flex justify-center mb-4">
-        <img src="logo-ipa.png" alt="Logo" class="h-16 w-auto" /> <!-- Cambia aquí tu logo -->
+        <img src="logo-ipa.png" alt="Logo" class="h-16 w-auto" />
       </div>
 
-      <!-- TÍTULO -->
-      <h1 class="text-2xl font-bold mb-6 text-center text-blue-900">🕒 Calculadora de Descuento por Tiempo</h1>
+      <h1 class="text-2xl font-bold text-center text-blue-900 mb-6">🧮 Calculadora de Descuentos</h1>
 
       <!-- FORMULARIO -->
-      <div class="mb-4">
-        <label class="block text-sm font-medium text-blue-900">💰 Sueldo Mensual (S/)</label>
-        <input id="sueldo" type="number" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-700 focus:ring-blue-700" placeholder="Ej. 1500" />
+      <div class="space-y-4">
+        <input id="sueldo" type="number" placeholder="💰 Sueldo Mensual" class="w-full p-2 rounded border border-gray-300 focus:ring-2 focus:ring-blue-800" />
+        <input id="horas" type="number" placeholder="⌛ Horas a Descontar" class="w-full p-2 rounded border border-gray-300 focus:ring-2 focus:ring-blue-800" />
+        <input id="minutos" type="number" placeholder="⏱️ Minutos a Descontar" class="w-full p-2 rounded border border-gray-300 focus:ring-2 focus:ring-blue-800" />
+        <input id="faltas" type="number" placeholder="📅 Días de Falta" class="w-full p-2 rounded border border-gray-300 focus:ring-2 focus:ring-blue-800" />
+        <input id="adelanto" type="number" placeholder="💳 Adelanto Solicitado" class="w-full p-2 rounded border border-gray-300 focus:ring-2 focus:ring-blue-800" />
+        <input id="afp" type="number" step="0.01" placeholder="📉 Porcentaje AFP (%)" class="w-full p-2 rounded border border-gray-300 focus:ring-2 focus:ring-blue-800" />
       </div>
 
-      <div class="mb-4">
-        <label class="block text-sm font-medium text-blue-900">⌛ Horas a Descontar</label>
-        <input id="horas" type="number" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-700 focus:ring-blue-700" placeholder="Ej. 2" />
-      </div>
-
-      <div class="mb-6">
-        <label class="block text-sm font-medium text-blue-900">⏱️ Minutos a Descontar</label>
-        <input id="minutos" type="number" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-700 focus:ring-blue-700" placeholder="Ej. 30" />
-      </div>
-
-      <!-- BOTÓN -->
-      <button onclick="calcularDescuento()" class="w-full bg-blue-800 hover:bg-blue-900 text-white font-bold py-2 px-4 rounded-lg transition">Calcular</button>
-
-      <!-- RESULTADO -->
-      <div id="resultado" class="mt-6 space-y-2 text-center text-lg font-semibold text-blue-900 hidden"></div>
+      <button onclick="calcularDescuento()" class="mt-6 w-full bg-blue-800 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-900 transition">Calcular</button>
     </div>
   </main>
 
-  <!-- PIE DE PÁGINA -->
-  <footer class="text-center py-4 text-white bg-black/70 text-sm">
-    © 2025 Amauta | Todos los derechos reservados.
+  <!-- FOOTER -->
+  <footer class="bg-black/70 text-white text-center py-4 text-sm">
+    © 2025 José. Todos los derechos reservados.
   </footer>
+
+  <!-- MODAL -->
+  <div id="modal" class="fixed inset-0 bg-black/60 flex items-center justify-center hidden z-50 p-4">
+    <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+      <h2 class="text-xl font-bold text-blue-900 mb-4 text-center">📊 Resumen de Descuentos</h2>
+      <div id="modalContent" class="space-y-2 text-blue-900 text-sm"></div>
+      <button onclick="cerrarModal()" class="mt-4 w-full bg-blue-800 hover:bg-blue-900 text-white py-2 px-4 rounded-lg">Cerrar</button>
+    </div>
+  </div>
 
   <!-- SCRIPT -->
   <script>
     function calcularDescuento() {
       const sueldo = parseFloat(document.getElementById("sueldo").value);
-      const horas = parseFloat(document.getElementById("horas").value);
-      const minutos = parseFloat(document.getElementById("minutos").value);
+      const horas = parseFloat(document.getElementById("horas").value) || 0;
+      const minutos = parseFloat(document.getElementById("minutos").value) || 0;
+      const faltas = parseFloat(document.getElementById("faltas").value) || 0;
+      const adelanto = parseFloat(document.getElementById("adelanto").value) || 0;
+      const afpPct = parseFloat(document.getElementById("afp").value) || 0;
 
-      if (isNaN(sueldo) || isNaN(horas) || isNaN(minutos)) {
-        alert("Por favor completa todos los campos correctamente.");
+      if (isNaN(sueldo) || sueldo <= 0) {
+        alert("Por favor, ingresa un sueldo válido.");
         return;
       }
 
       const sueldoDiario = sueldo / 30;
-      const sueldoHora = sueldoDiario / 8;
+      const sueldoHora = sueldoDiario / 12;
       const sueldoMinuto = sueldoHora / 60;
 
-      const descuento = (horas * sueldoHora) + (minutos * sueldoMinuto);
-      const sueldoNeto = sueldo - descuento;
+      const descuentoHoras = horas * sueldoHora;
+      const descuentoMinutos = minutos * sueldoMinuto;
+      const descuentoFaltas = faltas * sueldoDiario;
+      const descuentoAfp = sueldo * (afpPct / 100);
 
-      document.getElementById("resultado").innerHTML = `
-        <p>💸 Monto a Descontar: <strong>S/ ${descuento.toFixed(2)}</strong></p>
-        <p>📉 Sueldo Neto: <strong>S/ ${sueldoNeto.toFixed(2)}</strong></p>
+      const descuentoTotal = descuentoHoras + descuentoMinutos + descuentoFaltas + adelanto + descuentoAfp;
+      const sueldoNeto = sueldo - descuentoTotal;
+
+      const resumen = `
+      <p>
+ 
+        <p>💰 Sueldo Bruto: <strong>S/ ${sueldo.toFixed(2)}</strong></p>
+        <p>⌛ Horas descontadas: ${horas}h - S/ ${descuentoHoras.toFixed(2)}</p>
+        <p>⏱️ Minutos descontados: ${minutos}min - S/ ${descuentoMinutos.toFixed(2)}</p>
+        <p>📅 Faltas: ${faltas} día(s) - S/ ${descuentoFaltas.toFixed(2)}</p>
+        <p>💳 Adelanto: S/ ${adelanto.toFixed(2)}</p>
+        <p>📉 AFP (${afpPct}%): S/ ${descuentoAfp.toFixed(2)}</p>
+        <hr class="my-2" />
+
+         <p class="text-xs italic text-gray-600 mt-2 mb-1">Los montos finales son aproximados, ya que estan sujetos a modificaciones por parte de la Institución.</p>
+  <hr class="my-2" />
+        <p><strong>💸 Total Descuento:</strong> S/ ${descuentoTotal.toFixed(2)}</p>
+        <p><strong>✅ Sueldo Neto:</strong> S/ ${sueldoNeto.toFixed(2)}</p>
       `;
-      document.getElementById("resultado").classList.remove("hidden");
+
+      document.getElementById("modalContent").innerHTML = resumen;
+      document.getElementById("modal").classList.remove("hidden");
+    }
+
+    function cerrarModal() {
+      document.getElementById("modal").classList.add("hidden");
     }
   </script>
 </body>
 </html>
+
